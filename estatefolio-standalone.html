@@ -1,0 +1,1146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Estatefolio CRM</title>
+<style>
+  :root{
+    --navy:#0F1B3D; --royal:#2149E0; --royal-d:#1E40C4; --royal-light:#EEF2FF;
+    --green:#178A45; --green-bg:#E4F6EB; --red:#D42B2B; --red-bg:#FCE7E7;
+    --yellow:#E8B923; --yellow-d:#8a6a10; --purple:#6D28D9; --purple-d:#5a1fb0;
+    --bg:#F5F7FB; --card:#FFFFFF;
+    --ink:#141B2E; --ink-light:#4A5568; --ink-faint:#8894A8; --line:#E5E9F0;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  #app{max-width:640px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+  header.top{background:#fff;border-bottom:1px solid var(--line);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5;box-shadow:0 1px 3px rgba(15,29,51,0.04);}
+  header.top .greet{font-weight:800;font-size:18px;letter-spacing:-0.2px;}
+  header.top .sub{font-size:12.5px;color:var(--ink-faint);margin-top:2px;}
+  .avatar{width:56px;height:56px;border-radius:50%;background:var(--royal-light);color:var(--royal);display:flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden;flex-shrink:0;border:2px solid var(--royal-light);box-shadow:0 2px 8px rgba(33,73,224,0.18);cursor:pointer;}
+  .avatar img{width:100%;height:100%;object-fit:cover;}
+  main{flex:1;padding:16px;padding-bottom:90px;}
+  h1{font-size:22px;margin:0 0 2px;}
+  .muted{color:var(--ink-light);font-size:13px;margin:0 0 16px;}
+  .card{background:#fff;border-radius:16px;padding:18px;box-shadow:0 1px 2px rgba(15,29,51,0.04), 0 4px 16px rgba(15,29,51,0.05);border:1px solid rgba(15,29,51,0.03);margin-bottom:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .grid5{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat{border-radius:16px;padding:15px;box-shadow:0 1px 2px rgba(15,29,51,0.04), 0 4px 16px rgba(15,29,51,0.05);text-align:left;cursor:pointer;transition:transform 0.12s;border:1px solid transparent;}
+  .stat:active{transform:scale(0.97);}
+  .stat .icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;background:rgba(255,255,255,0.6);}
+  .stat .val{font-size:24px;font-weight:800;letter-spacing:-0.5px;}
+  .stat .lbl{font-size:11.5px;font-weight:600;margin-top:1px;}
+  .stat-royal{background:var(--purple);border-color:var(--purple-d);}
+  .stat-royal .icon{color:#fff;background:rgba(255,255,255,0.18);} .stat-royal .val{color:#fff;} .stat-royal .lbl{color:rgba(255,255,255,0.85);}
+  .stat-amber{background:var(--purple);border-color:var(--purple-d);}
+  .stat-amber .icon{color:#fff;background:rgba(255,255,255,0.18);} .stat-amber .val{color:#fff;} .stat-amber .lbl{color:rgba(255,255,255,0.85);}
+  .stat-green{background:var(--purple);border-color:var(--purple-d);}
+  .stat-green .icon{color:#fff;background:rgba(255,255,255,0.18);} .stat-green .val{color:#fff;} .stat-green .lbl{color:rgba(255,255,255,0.85);}
+  .stat-navy{background:var(--purple);border-color:var(--purple-d);}
+  .stat-navy .icon{color:#fff;background:rgba(255,255,255,0.18);} .stat-navy .val{color:#fff;} .stat-navy .lbl{color:rgba(255,255,255,0.85);}
+  .bg-royal{background:var(--royal-light);color:var(--royal);}
+  .bg-purple{background:rgba(109,40,217,0.12);color:var(--purple);}
+  .bg-green{background:var(--green-bg);color:var(--green);}
+  .bg-navy{background:rgba(15,27,61,0.06);color:var(--navy);}
+  h2.sec{font-size:14.5px;font-weight:800;margin:0 0 14px;letter-spacing:0.2px;text-transform:uppercase;color:var(--navy);opacity:0.85;}
+  .pipe{height:12px;border-radius:99px;background:#eef1f6;display:flex;overflow:hidden;margin-bottom:12px;}
+  .pipe span{height:100%;}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;}
+  .legend .item{display:flex;align-items:center;gap:6px;font-size:13px;background:none;border:none;padding:4px 2px;cursor:pointer;}
+  .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .segrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .segbtn{border:1px solid var(--line);border-radius:12px;padding:11px;text-align:left;background:#fff;cursor:pointer;transition:transform 0.12s;}
+  .segbtn:active{transform:scale(0.97);}
+  .segbtn .n{font-size:21px;font-weight:800;margin-top:7px;}
+  .seg-hot{background:var(--green);border-color:#136937;}
+  .seg-hot .n{color:#fff;} .seg-hot .segbtn-label{color:rgba(255,255,255,0.85);}
+  .seg-warm{background:var(--yellow);border-color:#c99a10;}
+  .seg-warm .n{color:#3a2c05;} .seg-warm .segbtn-label{color:#5a4308;}
+  .seg-prospect{background:var(--royal);border-color:var(--royal-d);}
+  .seg-prospect .n{color:#fff;} .seg-prospect .segbtn-label{color:rgba(255,255,255,0.85);}
+  .seg-cold{background:var(--red);border-color:#a82121;}
+  .seg-cold .n{color:#fff;} .seg-cold .segbtn-label{color:rgba(255,255,255,0.85);}
+  .segbtn-label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;}
+  .badge{display:inline-flex;align-items:center;border-radius:99px;padding:4px 10px;font-size:11px;font-weight:700;}
+  .b-hot{background:var(--green);color:#fff;}
+  .b-warm{background:var(--yellow);color:#3a2c05;}
+  .b-prospect{background:var(--royal);color:#fff;}
+  .b-cold{background:var(--red);color:#fff;}
+  .b-new{background:var(--royal);color:#fff;}
+  .b-contacted{background:var(--navy);color:#fff;}
+  .b-sitevisit{background:var(--royal-d);color:#fff;}
+  .b-negotiation{background:var(--navy);color:#fff;}
+  .b-won,.b-completed{background:var(--green);color:#fff;}
+  .b-lost,.b-cancelled{background:var(--red);color:#fff;}
+  .b-scheduled{background:var(--royal);color:#fff;}
+  .b-dead{background:var(--red);color:#fff;}
+  .toprow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+  .btn{border:none;border-radius:10px;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:transform 0.1s, box-shadow 0.15s;}
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--royal);color:#fff;box-shadow:0 2px 8px rgba(33,73,224,0.28);}
+  .btn-outline{background:#fff;border:1px solid var(--line);color:var(--ink);}
+  .btn-danger{background:var(--red);color:#fff;box-shadow:0 2px 8px rgba(212,43,43,0.25);}
+  .btn-sm{padding:7px 11px;font-size:12px;}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-size:14px;font-family:inherit;color:var(--ink);background:#fff;}
+  label.f{display:block;margin-bottom:12px;}
+  label.f span{display:block;font-size:11px;font-weight:700;color:var(--ink-light);margin-bottom:4px;}
+  .searchbar{position:relative;flex:1;}
+  .searchbar input{padding-left:34px;}
+  .searchbar .ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-faint);}
+  .filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .tab{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--ink-light);transition:all 0.15s;}
+  .tab.active{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 2px 6px rgba(15,27,61,0.25);}
+  .leadcard{background:#fff;border-radius:16px;padding:15px;box-shadow:0 1px 2px rgba(15,29,51,0.04), 0 4px 16px rgba(15,29,51,0.05);border:1px solid rgba(15,29,51,0.03);margin-bottom:10px;}
+  .leadcard-lead{background:linear-gradient(150deg,#F3F0FC,#EDE7FA);border-color:rgba(109,40,217,0.12);}
+  .leadcard-lead .actrow{border-top-color:rgba(109,40,217,0.14);}
+  .leadcard .top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .leadcard .name{font-weight:700;}
+  .leadcard .sub{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+  .leadcard .req{font-size:13px;color:var(--ink-light);margin:8px 0;}
+  .tagrow{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap;}
+  .actrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-top:1px solid var(--line);padding-top:10px;margin-top:6px;}
+  .actbtn{display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;font-size:10px;font-weight:700;padding:6px 2px;border-radius:8px;cursor:pointer;}
+  .actbtn:active{background:#f1f3f8;}
+  .c-green{color:var(--green);} .c-royal{color:var(--royal);} .c-red{color:var(--red);} .c-navy{color:var(--navy);} .c-ink{color:var(--ink-light);}
+  .empty{text-align:center;color:var(--ink-faint);font-size:13px;padding:36px 10px;}
+  nav.bottom{position:fixed;bottom:0;left:0;right:0;background:var(--navy);border-top:none;display:flex;max-width:640px;margin:0 auto;z-index:10;padding:8px 8px calc(8px + env(safe-area-inset-bottom));gap:4px;box-shadow:0 -2px 12px rgba(0,0,0,0.15);}
+  nav.bottom button{flex:1;background:none;border:none;padding:8px 2px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:rgba(255,255,255,0.55);cursor:pointer;border-radius:12px;transition:background 0.15s;}
+  nav.bottom button.active{color:#fff;background:var(--royal);}
+  nav.bottom .ic{display:flex;align-items:center;justify-content:center;}
+  .modal-bg{position:fixed;inset:0;background:rgba(15,27,61,0.5);display:flex;align-items:flex-end;justify-content:center;z-index:50;}
+  .modal{background:#fff;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:0;}
+  .modal .mh{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;}
+  .modal .mh h3{margin:0;font-size:16px;}
+  .modal .mh button{background:none;border:none;font-size:20px;color:var(--ink-faint);cursor:pointer;}
+  .modal .mb{padding:16px;}
+  .segpick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+  .segpick button{border:1px solid var(--line);border-radius:10px;padding:8px 2px;font-size:12px;font-weight:700;background:#fff;cursor:pointer;color:var(--ink-light);}
+  .segpick button.sel{border-color:var(--royal);background:var(--royal-light);color:var(--royal);}
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;display:flex;gap:14px;align-items:center;z-index:60;box-shadow:0 6px 20px rgba(0,0,0,0.25);}
+  .toast button{background:none;border:none;color:#5FE3C4;font-weight:700;font-size:13px;cursor:pointer;}
+  .row-between{display:flex;justify-content:space-between;align-items:center;}
+  .fileinput{display:none;}
+  a.linkbtn{text-decoration:none;}
+  .settings-photo{width:76px;height:76px;border-radius:50%;background:var(--royal-light);color:var(--royal);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:28px;flex-shrink:0;}
+  .settings-photo img{width:100%;height:100%;object-fit:cover;}
+  .warn{background:var(--red-bg);color:#8a1f1f;border-radius:14px;padding:12px 14px;font-size:12.5px;display:flex;gap:10px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ---------------- Storage ---------------- */
+const LS = {
+  leads: 'ef_leads', meetings: 'ef_meetings', profile: 'ef_profile'
+};
+function load(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
+function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+function sanitizeLead(l, uidFn){
+  if(!l || typeof l!=='object') return null;
+  const name = typeof l.name==='string' && l.name.trim() ? l.name.trim() : '';
+  if(!name) return null; // a lead without a name can't be safely displayed
+  return {
+    id: (typeof l.id==='string' && l.id) ? l.id : uidFn(),
+    name: name,
+    phone: typeof l.phone==='string' ? l.phone : (l.phone!=null ? String(l.phone) : ''),
+    email: typeof l.email==='string' ? l.email : '',
+    source: typeof l.source==='string' ? l.source : 'Other',
+    budget: typeof l.budget==='string' ? l.budget : '',
+    requirement: typeof l.requirement==='string' ? l.requirement : '',
+    stage: LEAD_STAGES_SAFE.includes(l.stage) ? l.stage : 'New',
+    segment: LEAD_SEGMENTS_SAFE.includes(l.segment) ? l.segment : 'Warm',
+    notes: typeof l.notes==='string' ? l.notes : '',
+    createdAt: (typeof l.createdAt==='string' && !isNaN(new Date(l.createdAt))) ? l.createdAt : new Date().toISOString()
+  };
+}
+function sanitizeMeeting(m, uidFn){
+  if(!m || typeof m!=='object') return null;
+  const clientName = typeof m.clientName==='string' && m.clientName.trim() ? m.clientName.trim() : '';
+  const dateTime = (typeof m.dateTime==='string' && !isNaN(new Date(m.dateTime))) ? m.dateTime : '';
+  if(!clientName || !dateTime) return null;
+  return {
+    id: (typeof m.id==='string' && m.id) ? m.id : uidFn(),
+    clientName: clientName,
+    leadId: typeof m.leadId==='string' ? m.leadId : '',
+    type: typeof m.type==='string' ? m.type : 'Client Meeting',
+    dateTime: dateTime,
+    location: typeof m.location==='string' ? m.location : '',
+    status: ['Scheduled','Completed','Cancelled'].includes(m.status) ? m.status : 'Scheduled',
+    createdAt: (typeof m.createdAt==='string' && !isNaN(new Date(m.createdAt))) ? m.createdAt : new Date().toISOString(),
+    history: Array.isArray(m.history) ? m.history.filter(h=>h && typeof h==='object') : []
+  };
+}
+function sanitizeLeadsArray(arr){
+  if(!Array.isArray(arr)) return [];
+  const tempUid = ()=> Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  return arr.map(l=>sanitizeLead(l, tempUid)).filter(Boolean);
+}
+function sanitizeMeetingsArray(arr){
+  if(!Array.isArray(arr)) return [];
+  const tempUid = ()=> Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  return arr.map(m=>sanitizeMeeting(m, tempUid)).filter(Boolean);
+}
+const LEAD_STAGES_SAFE = ['New','Contacted','Site Visit','Negotiation','Won','Lost'];
+const LEAD_SEGMENTS_SAFE = ['Hot','Warm','Prospect','Cold'];
+
+let state = {
+  leads: sanitizeLeadsArray(load(LS.leads, [])),
+  meetings: sanitizeMeetingsArray(load(LS.meetings, [])),
+  profile: load(LS.profile, {name:'Veer', photo:''}),
+  view: 'dashboard',
+  toast: null,
+  toastTimer: null,
+  undo: null,
+  modal: null,
+  leadsFilter: {query:'', stage:'All', segment:'All', dateFrom:'', dateTo:''},
+  meetingsFilter: {status:'Upcoming', query:'', date:''}
+};
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function persistLeads(){ save(LS.leads, state.leads); }
+function persistMeetings(){ save(LS.meetings, state.meetings); }
+function persistProfile(){ save(LS.profile, state.profile); }
+
+function showToast(msg, undoFn){
+  state.toast = msg; state.undo = undoFn || null;
+  clearTimeout(state.toastTimer);
+  state.toastTimer = setTimeout(()=>{ state.toast=null; state.undo=null; render(); }, 4500);
+  render();
+}
+
+/* ---------------- Utils ---------------- */
+function getGreeting(){
+  const h = new Date().getHours();
+  if(h<12) return 'Good Morning';
+  if(h<17) return 'Good Afternoon';
+  return 'Good Evening';
+}
+function fmtDate(iso){ if(!iso) return '—'; const d = new Date(iso); if(isNaN(d)) return '—'; return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtDateTime(iso){ if(!iso) return '—'; const d = new Date(iso); if(isNaN(d)) return '—'; return d.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function digits(p){ return (p||'').replace(/[^\d+]/g,''); }
+function waLink(phone,msg){ const c = digits(phone).replace(/^\+/,''); return 'https://wa.me/'+c+(msg?('?text='+encodeURIComponent(msg)):''); }
+function telLink(phone){ return 'tel:'+digits(phone); }
+function isSameDay(a,b){ return new Date(a).toDateString() === new Date(b).toDateString(); }
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function ic(name, size){
+  size = size || 18;
+  const P = {
+    users:'<path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+    calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
+    check:'<path d="M20 7 10 18l-5-5"/>',
+    flag:'<path d="M5 3v18"/><path d="M5 4h11l-2 4 2 4H5"/>',
+    home:'<path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1Z"/>',
+    save:'<path d="M5 4h11l4 4v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M8 4v5h8V4"/><path d="M8 21v-6h8v6"/>',
+    settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+    chat:'<path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.3a8.4 8.4 0 0 1 8.2 8v.5z"/>',
+    phone:'<path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 9.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/>',
+    edit:'<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+    trash:'<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/>',
+    history:'<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7v5l3 3"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    upload:'<path d="M12 16V4"/><path d="M6 10l6-6 6 6"/><path d="M4 20h16"/>',
+    download:'<path d="M12 4v12"/><path d="M6 12l6 6 6-6"/><path d="M4 20h16"/>',
+    x:'<path d="M18 6 6 18M6 6l12 12"/>',
+    user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+    alert:'<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
+    arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'
+  };
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(P[name]||'')+'</svg>';
+}
+
+const LEAD_STAGES = ['New','Contacted','Site Visit','Negotiation','Won','Lost'];
+const LEAD_SEGMENTS = ['Hot','Warm','Prospect','Cold'];
+const STAGE_COLORS = {New:'#2149E0',Contacted:'#0F1B3D','Site Visit':'#1E40C4',Negotiation:'#0F1B3D',Won:'#178A45',Lost:'#D42B2B'};
+const MEETING_TYPES = ['Client Meeting','Site Visit','Follow-up Call','Document Signing'];
+
+function stageBadgeClass(s){ return 'b-'+s.toLowerCase().replace(/\s+/g,''); }
+function stageLabel(s){ return s==='Lost' ? 'Dead' : s; }
+function segBadgeClass(s){ return 'b-'+ (s||'warm').toLowerCase(); }
+
+/* ---------------- Lead / Meeting ops ---------------- */
+function addLead(data){
+  const lead = Object.assign({id:uid(), createdAt:new Date().toISOString(), stage:'New', segment:'Warm'}, data);
+  state.leads.unshift(lead); persistLeads(); return lead;
+}
+function updateLead(id, updates){
+  state.leads = state.leads.map(l=> l.id===id ? Object.assign({},l,updates) : l);
+  persistLeads();
+}
+function deleteLead(id){
+  const removed = state.leads.find(l=>l.id===id);
+  state.leads = state.leads.filter(l=>l.id!==id);
+  persistLeads();
+  showToast('Lead deleted', ()=>{ state.leads.unshift(removed); persistLeads(); render(); });
+}
+function closeLead(id){ updateLead(id, {stage:'Won'}); showToast('Marked as Closed'); }
+function markDead(id){ updateLead(id, {stage:'Lost'}); showToast('Marked as Dead'); }
+
+function addMeeting(data){
+  const m = Object.assign({id:uid(), createdAt:new Date().toISOString(), status:'Scheduled', history:[]}, data);
+  state.meetings.unshift(m); persistMeetings(); return m;
+}
+function updateMeeting(id, updates){
+  state.meetings = state.meetings.map(m=> m.id===id ? Object.assign({},m,updates) : m);
+  persistMeetings();
+}
+function rescheduleMeeting(id, newDT, remarks){
+  state.meetings = state.meetings.map(m=>{
+    if(m.id!==id) return m;
+    const hist = (m.history||[]).concat([{from:m.dateTime, to:newDT, reason:remarks||'', changedAt:new Date().toISOString()}]);
+    return Object.assign({}, m, {dateTime:newDT, status:'Scheduled', history:hist});
+  });
+  persistMeetings();
+}
+function deleteMeeting(id){
+  const removed = state.meetings.find(m=>m.id===id);
+  state.meetings = state.meetings.filter(m=>m.id!==id);
+  persistMeetings();
+  showToast('Meeting deleted', ()=>{ state.meetings.unshift(removed); persistMeetings(); render(); });
+}
+function getNextMeetingForLead(leadId){
+  const up = state.meetings.filter(m=>m.leadId===leadId && m.status==='Scheduled').sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime));
+  return up[0]||null;
+}
+function markVisitDone(lead){
+  const m = getNextMeetingForLead(lead.id);
+  if(m){ updateMeeting(m.id,{status:'Completed'}); showToast('Visit marked as done'); }
+  else showToast('No upcoming visit found for this lead');
+}
+
+/* ---------------- Render: shell ---------------- */
+function render(){
+  const app = document.getElementById('app');
+  try{
+    app.innerHTML = `
+      ${renderHeader()}
+      <main>${renderView()}</main>
+      ${renderBottomNav()}
+      ${state.modal ? renderModal() : ''}
+      ${state.toast ? renderToast() : ''}
+    `;
+    bindEvents();
+  }catch(err){
+    console.error('Render error:', err);
+    app.innerHTML = `
+      <div style="max-width:480px;margin:60px auto;padding:24px;text-align:center;">
+        <h2 style="color:var(--red);margin-bottom:8px;">Something went wrong</h2>
+        <p style="color:var(--ink-light);font-size:14px;margin-bottom:20px;">
+          A view failed to load, likely due to unexpected data (e.g. from an import). Your other data is safe.
+        </p>
+        <p style="font-size:12px;color:var(--ink-faint);margin-bottom:20px;word-break:break-word;">${esc(err.message||String(err))}</p>
+        <button class="btn btn-outline" style="margin-right:8px;" onclick="state.view='dashboard';state.modal=null;render();">Go to Dashboard</button>
+        <button class="btn btn-danger" onclick="if(confirm('This will erase all leads, meetings, and settings stored in this browser. Continue?')){localStorage.clear();location.reload();}">Reset All Data</button>
+      </div>`;
+  }
+}
+
+function renderHeader(){
+  const p = state.profile;
+  const photoHtml = p.photo ? `<img src="${p.photo}"/>` : ic('user',26);
+  return `
+  <header class="top">
+    <div>
+      <div class="greet">${getGreeting()}, ${esc(p.name||'there')}</div>
+      <div class="sub">Here's what's happening today.</div>
+    </div>
+    <div class="avatar" data-nav="settings">${photoHtml}</div>
+  </header>`;
+}
+
+function renderBottomNav(){
+  const tabs = [
+    {id:'dashboard', label:'Home', icon:'home'},
+    {id:'leads', label:'Leads', icon:'users'},
+    {id:'meetings', label:'Visits', icon:'calendar'},
+    {id:'data', label:'Backup', icon:'save'},
+    {id:'settings', label:'Settings', icon:'settings'},
+  ];
+  return `<nav class="bottom">${tabs.map(t=>`
+    <button class="${state.view===t.id?'active':''}" data-nav="${t.id}">
+      <span class="ic">${ic(t.icon,20)}</span>${t.label}
+    </button>`).join('')}</nav>`;
+}
+
+function renderToast(){
+  return `<div class="toast"><span>${esc(state.toast)}</span>${state.undo? `<button data-action="undo">Undo</button>`:''}</div>`;
+}
+
+function renderView(){
+  if(state.view==='dashboard') return renderDashboard();
+  if(state.view==='leads') return renderLeads();
+  if(state.view==='meetings') return renderMeetings();
+  if(state.view==='data') return renderData();
+  if(state.view==='settings') return renderSettings();
+  return '';
+}
+
+/* ---------------- Dashboard ---------------- */
+function renderDashboard(){
+  const leads = state.leads, meetings = state.meetings;
+  const stageCounts = {}; LEAD_STAGES.forEach(s=>stageCounts[s]=0);
+  leads.forEach(l=>{ if(stageCounts[l.stage]!==undefined) stageCounts[l.stage]++; });
+  const segCounts = {}; LEAD_SEGMENTS.forEach(s=>segCounts[s]=0);
+  leads.forEach(l=>{ if(segCounts[l.segment]!==undefined) segCounts[l.segment]++; });
+  const total = leads.length || 1;
+  const now = new Date();
+  const pendingToday = meetings.filter(m=>m.status==='Scheduled' && isSameDay(m.dateTime, now));
+  const upcoming = meetings.filter(m=>m.status==='Scheduled' && new Date(m.dateTime)>=now).sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime));
+  const closed = stageCounts['Won'];
+  const recentLeads = [...leads].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5);
+
+  const stats = [
+    {label:'Total Leads', val:leads.length, icon:'users', cls:'stat-royal', nav:'leads'},
+    {label:'Pending Today', val:pendingToday.length, icon:'clock', cls:'stat-amber', nav:'meetings', mf:{status:'Today'}},
+    {label:'Upcoming Visits', val:upcoming.length, icon:'calendar', cls:'stat-royal', nav:'meetings', mf:{status:'Upcoming'}},
+    {label:'Total Visits', val:meetings.length, icon:'check', cls:'stat-navy', nav:'meetings', mf:{status:'All'}},
+    {label:'Closed Clients', val:closed, icon:'flag', cls:'stat-green', nav:'leads', lf:{stage:'Won'}},
+  ];
+
+  return `
+    <h1>Dashboard</h1>
+    <p class="muted">Your pipeline at a glance.</p>
+    <div class="grid5">
+      ${stats.map(s=>`
+        <button class="stat ${s.cls}" data-nav="${s.nav}" data-lf='${s.lf?JSON.stringify(s.lf):''}' data-mf='${s.mf?JSON.stringify(s.mf):''}'>
+          <div class="icon">${ic(s.icon,18)}</div>
+          <div class="val">${s.val}</div>
+          <div class="lbl">${s.label}</div>
+        </button>`).join('')}
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h2 class="sec">Clients by Segment</h2>
+      <div class="segrow">
+        ${LEAD_SEGMENTS.map(seg=>`
+          <button class="segbtn seg-${seg.toLowerCase()}" data-nav="leads" data-lf='${JSON.stringify({segment:seg})}'>
+            <span class="segbtn-label">${seg}</span>
+            <div class="n">${segCounts[seg]}</div>
+          </button>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="sec">Pipeline Overview</h2>
+      <div class="pipe">
+        ${LEAD_STAGES.map(s=>{ const pct=(stageCounts[s]/total*100); if(pct<=0) return ''; return `<span style="width:${pct}%;background:${STAGE_COLORS[s]}"></span>`; }).join('')}
+      </div>
+      <div class="legend">
+        ${LEAD_STAGES.map(s=>`
+          <button class="item" data-nav="leads" data-lf='${JSON.stringify({stage:s})}'>
+            <span class="dot" style="background:${STAGE_COLORS[s]}"></span>${stageLabel(s)} <b>${stageCounts[s]}</b>
+          </button>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row-between"><h2 class="sec">Recent Leads</h2><button class="btn btn-outline btn-sm" data-nav="leads">View all</button></div>
+      ${recentLeads.length===0 ? '<div class="empty">No leads yet. Add your first lead to get started.</div>' :
+        recentLeads.map(l=>`
+        <div class="row-between" style="padding:8px 0;border-top:1px solid var(--line);">
+          <div><div style="font-weight:700;">${esc(l.name)}</div><div class="sub">${esc(l.requirement||l.source||'')}</div></div>
+          <div><span class="badge ${stageBadgeClass(l.stage)}">${stageLabel(l.stage)}</span></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <div class="row-between"><h2 class="sec">Upcoming Visits & Meetings</h2><button class="btn btn-outline btn-sm" data-nav="meetings">View all</button></div>
+      ${upcoming.length===0 ? '<div class="empty">Nothing scheduled. Plan a client meeting or site visit.</div>' :
+        upcoming.slice(0,5).map(m=>`
+        <div class="row-between" style="padding:8px 0;border-top:1px solid var(--line);">
+          <div><div style="font-weight:700;">${esc(m.clientName)}</div><div class="sub">${esc(m.type)} · ${fmtDateTime(m.dateTime)}</div></div>
+          <span class="badge b-scheduled">${m.status}</span>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+/* ---------------- Leads ---------------- */
+function filteredLeads(){
+  let list = [...state.leads];
+  const f = state.leadsFilter;
+  if(f.stage!=='All') list = list.filter(l=>l.stage===f.stage);
+  if(f.segment!=='All') list = list.filter(l=>l.segment===f.segment);
+  if(f.dateFrom) list = list.filter(l=>new Date(l.createdAt)>=new Date(f.dateFrom));
+  if(f.dateTo) list = list.filter(l=>new Date(l.createdAt)<=new Date(f.dateTo+'T23:59:59'));
+  if(f.query.trim()){
+    const q = f.query.toLowerCase();
+    list = list.filter(l=> l.name.toLowerCase().includes(q) || (l.phone||'').includes(q) || (l.requirement||'').toLowerCase().includes(q));
+  }
+  list.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+  return list;
+}
+
+function renderLeads(){
+  const leads = state.leads;
+  const list = filteredLeads();
+  const f = state.leadsFilter;
+  return `
+    <div class="toprow">
+      <div><h1 style="margin-bottom:0;">Leads & Clients</h1><p class="muted" style="margin-bottom:0;">${leads.length} total leads</p></div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline btn-sm" data-action="import-csv">${ic('upload',14)} Import</button>
+        <button class="btn btn-outline btn-sm" data-action="export-csv">${ic('download',14)} Export</button>
+        <button class="btn btn-primary btn-sm" data-action="add-lead">${ic('plus',14)} Add</button>
+      </div>
+    </div>
+    <input type="file" id="csvFileInput" class="fileinput" accept=".csv" />
+
+    <div class="tabs">
+      <button class="tab ${f.segment==='All'?'active':''}" data-action="seg-filter" data-seg="All">All (${leads.length})</button>
+      ${LEAD_SEGMENTS.map(s=>`<button class="tab ${f.segment===s?'active':''}" data-action="seg-filter" data-seg="${s}">${s} (${leads.filter(l=>l.segment===s).length})</button>`).join('')}
+    </div>
+
+    <div class="filters">
+      <div class="searchbar"><span class="ic">${ic('search',15)}</span><input id="leadSearch" placeholder="Search name, phone, requirement..." value="${esc(f.query)}"/></div>
+      <select id="stageFilter">
+        <option value="All">All Stages</option>
+        ${LEAD_STAGES.map(s=>`<option value="${s}" ${f.stage===s?'selected':''}>${stageLabel(s)}</option>`).join('')}
+      </select>
+      <button class="btn btn-outline btn-sm" data-action="date-filter">${ic('calendar',15)} Date</button>
+    </div>
+    ${(f.dateFrom||f.dateTo)? `<p class="muted">Filtering: ${f.dateFrom?fmtDate(f.dateFrom):'any'} → ${f.dateTo?fmtDate(f.dateTo):'any'} <button data-action="clear-date" style="color:var(--red);border:none;background:none;font-weight:700;">Clear</button></p>`:''}
+
+    ${list.length===0 ? '<div class="empty">No leads match your filters.</div>' :
+      list.map(l=>renderLeadCard(l)).join('')}
+  `;
+}
+
+function renderLeadCard(l){
+  return `
+  <div class="leadcard leadcard-lead">
+    <div class="top">
+      <div><div class="name">${esc(l.name)}</div><div class="sub">${esc(l.phone)}</div></div>
+      <span class="badge ${stageBadgeClass(l.stage)}">${stageLabel(l.stage)}</span>
+    </div>
+    ${l.requirement? `<div class="req">${esc(l.requirement)}</div>`:''}
+    <div class="tagrow"><span class="badge ${segBadgeClass(l.segment)}">${l.segment||'Warm'}</span><span class="sub">Added ${fmtDate(l.createdAt)}</span></div>
+    <div class="actrow">
+      <a class="actbtn c-green" href="${waLink(l.phone,'Hi '+l.name+', ')}" target="_blank">${ic('chat',17)}<span>WhatsApp</span></a>
+      <a class="actbtn c-royal" href="${telLink(l.phone)}">${ic('phone',17)}<span>Call</span></a>
+      <button class="actbtn c-ink" data-action="edit-lead" data-id="${l.id}">${ic('edit',17)}<span>Edit</span></button>
+      <button class="actbtn c-navy" data-action="reschedule-lead" data-id="${l.id}">${ic('calendar',15)}<span>Visit</span></button>
+      <button class="actbtn c-green" data-action="mark-done" data-id="${l.id}">${ic('check',17)}<span>Done</span></button>
+      <button class="actbtn c-royal" data-action="close-lead" data-id="${l.id}">${ic('flag',17)}<span>Closed</span></button>
+      <button class="actbtn c-red" data-action="mark-dead" data-id="${l.id}">${ic('x',17)}<span>Dead</span></button>
+      <button class="actbtn c-red" data-action="delete-lead" data-id="${l.id}">${ic('trash',17)}<span>Delete</span></button>
+    </div>
+  </div>`;
+}
+
+/* ---------------- Meetings ---------------- */
+function filteredMeetings(){
+  let list = [...state.meetings].sort((a,b)=>new Date(a.dateTime)-new Date(b.dateTime));
+  const f = state.meetingsFilter, now = new Date();
+  if(f.status==='Today') list = list.filter(m=>isSameDay(m.dateTime, now) && m.status==='Scheduled');
+  if(f.status==='Upcoming') list = list.filter(m=>new Date(m.dateTime)>=now && m.status==='Scheduled');
+  if(f.status==='Completed') list = list.filter(m=>m.status==='Completed');
+  if(f.status==='Cancelled') list = list.filter(m=>m.status==='Cancelled');
+  if(f.query.trim()){ const q=f.query.toLowerCase(); list = list.filter(m=>m.clientName.toLowerCase().includes(q)); }
+  if(f.date) list = list.filter(m=>isSameDay(m.dateTime, f.date));
+  return list;
+}
+
+function renderMeetings(){
+  const meetings = state.meetings;
+  const f = state.meetingsFilter;
+  const list = filteredMeetings();
+  return `
+    <div class="toprow">
+      <div><h1 style="margin-bottom:0;">Meetings & Visits</h1><p class="muted" style="margin-bottom:0;">${meetings.length} total scheduled</p></div>
+      <button class="btn btn-primary btn-sm" data-action="add-meeting">+ Schedule</button>
+    </div>
+    <div class="tabs">
+      ${['Today','Upcoming','Completed','Cancelled','All'].map(s=>`<button class="tab ${f.status===s?'active':''}" data-action="meet-status-filter" data-s="${s}">${s}</button>`).join('')}
+    </div>
+    <div class="filters">
+      <div class="searchbar"><span class="ic">${ic('search',15)}</span><input id="meetSearch" placeholder="Search by client name..." value="${esc(f.query)}"/></div>
+      <input type="date" id="meetDate" value="${f.date}" style="max-width:150px;"/>
+      ${f.date? `<button data-action="clear-meet-date" style="color:var(--red);border:none;background:none;font-weight:700;">Clear</button>`:''}
+    </div>
+    ${list.length===0 ? '<div class="empty">No meetings in this view.</div>' :
+      list.map(m=>renderMeetingCard(m)).join('')}
+  `;
+}
+
+function findFollowUp(m){
+  if(!m.leadId) return null;
+  return state.meetings.find(x=>x.id!==m.id && x.leadId===m.leadId && x.status==='Scheduled' && new Date(x.dateTime) > new Date(m.dateTime)) || null;
+}
+function findPriorVisit(m){
+  if(!m.leadId) return null;
+  const prior = state.meetings.filter(x=>x.id!==m.id && x.leadId===m.leadId && x.status==='Completed' && new Date(x.dateTime) < new Date(m.dateTime))
+    .sort((a,b)=>new Date(b.dateTime)-new Date(a.dateTime));
+  return prior[0] || null;
+}
+function renderMeetingCard(m){
+  const followUp = m.status==='Completed' ? findFollowUp(m) : null;
+  const priorVisit = m.status==='Scheduled' ? findPriorVisit(m) : null;
+  return `
+  <div class="leadcard">
+    <div class="row-between">
+      <div><div class="name">${esc(m.clientName)}</div><div class="sub">${esc(m.type)} · ${fmtDateTime(m.dateTime)}</div>${m.location?`<div class="sub">${esc(m.location)}</div>`:''}</div>
+      <span class="badge b-${m.status.toLowerCase()}">${m.status}</span>
+    </div>
+    ${followUp? `<div class="sub" style="margin-top:8px;color:var(--royal);font-weight:700;">${ic('calendar',12)} Follow-up visit scheduled for ${fmtDateTime(followUp.dateTime)}</div>`:''}
+    ${priorVisit? `<div class="sub" style="margin-top:8px;color:var(--green);font-weight:700;">${ic('check',12)} Follow-up to visit completed ${fmtDateTime(priorVisit.dateTime)}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+      ${(m.history&&m.history.length)? `<button class="btn btn-outline btn-sm" data-action="show-history" data-id="${m.id}">${ic('history',14)} History (${m.history.length})</button>`:''}
+      ${m.status==='Scheduled' ? `
+        <button class="btn btn-outline btn-sm" data-action="reschedule-meeting" data-id="${m.id}">${ic('calendar',15)} Reschedule</button>
+        <button class="btn btn-outline btn-sm" data-action="complete-meeting" data-id="${m.id}" style="color:var(--green);">${ic('check',17)} Complete</button>
+        <button class="btn btn-outline btn-sm" data-action="cancel-meeting" data-id="${m.id}" style="color:var(--red);">${ic('x',14)} Cancel</button>
+      `:''}
+      <button class="btn btn-outline btn-sm" data-action="delete-meeting" data-id="${m.id}" style="color:var(--red);">${ic('trash',17)}</button>
+    </div>
+  </div>`;
+}
+
+/* ---------------- Data & Backup ---------------- */
+function renderData(){
+  const leads = state.leads, meetings = state.meetings;
+  return `
+    <h1>Data & Backup</h1>
+    <p class="muted">Everything is stored locally in this browser. Back up regularly.</p>
+    <div class="grid2">
+      <div class="stat stat-royal"><div class="icon">${ic('users',18)}</div><div class="val">${leads.length}</div><div class="lbl">Leads stored</div></div>
+      <div class="stat stat-navy"><div class="icon">${ic('calendar',15)}</div><div class="val">${meetings.length}</div><div class="lbl">Meetings stored</div></div>
+    </div>
+    <div class="card">
+      <h2 class="sec">Full Backup</h2>
+      <p class="muted">Download a complete JSON snapshot of all leads and meetings.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" data-action="full-backup">${ic('download',14)} Download Backup (.json)</button>
+        <button class="btn btn-outline" data-action="restore-backup">${ic('upload',14)} Add / Restore Data</button>
+      </div>
+      <input type="file" id="restoreFileInput" class="fileinput" accept=".json"/>
+    </div>
+    <div class="card">
+      <h2 class="sec">Export Leads (CSV)</h2>
+      <p class="muted">Export leads as a spreadsheet-friendly CSV.</p>
+      <button class="btn btn-outline" data-action="export-csv">${ic('download',14)} Export Leads CSV</button>
+    </div>
+    <div class="warn">${ic('alert',18)} Data lives only in this browser. Clearing browser data or switching devices/browsers will not preserve it. Download a backup often.</div>
+    <div class="card" style="margin-top:14px;">
+      <h2 class="sec" style="color:var(--red);opacity:1;">Danger Zone</h2>
+      <p class="muted">If the app ever gets stuck or shows an error, this clears everything stored in this browser and starts fresh. Back up first if you can.</p>
+      <button class="btn btn-danger" data-action="reset-all">Reset All Data</button>
+    </div>
+  `;
+}
+
+/* ---------------- Settings ---------------- */
+function renderSettings(){
+  const p = state.profile;
+  const photoHtml = p.photo? `<img src="${p.photo}"/>` : ic('user',30);
+  return `
+    <h1>Settings</h1>
+    <p class="muted">Manage your profile.</p>
+    <div class="card">
+      <h2 class="sec">Profile Photo</h2>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="settings-photo">${photoHtml}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-primary btn-sm" data-action="upload-photo">${ic('upload',15)} Upload Photo</button>
+          ${p.photo? `<button class="btn btn-outline btn-sm" data-action="remove-photo" style="color:var(--red);">${ic('trash',17)} Remove</button>`:''}
+        </div>
+      </div>
+      <input type="file" id="photoInput" class="fileinput" accept="image/*"/>
+    </div>
+    <div class="card">
+      <h2 class="sec">Display Name</h2>
+      <label class="f"><span>Name</span><input id="nameInput" value="${esc(p.name)}" placeholder="Your name"/></label>
+      <p class="muted" style="margin-top:-8px;">This appears in your dashboard greeting.</p>
+      <button class="btn btn-primary" data-action="save-name">Save Changes</button>
+    </div>
+  `;
+}
+
+/* ---------------- Modals ---------------- */
+function renderModal(){
+  const m = state.modal;
+  if(m.type==='lead-form') return renderLeadFormModal(m.data);
+  if(m.type==='meeting-form') return renderMeetingFormModal();
+  if(m.type==='reschedule-lead') return renderRescheduleLeadModal(m.data);
+  if(m.type==='reschedule-meeting') return renderRescheduleMeetingModal(m.data);
+  if(m.type==='history') return renderHistoryModal(m.data);
+  if(m.type==='date-filter') return renderDateFilterModal();
+  if(m.type==='confirm') return renderConfirmModal(m.data);
+  if(m.type==='restore-options') return renderRestoreOptionsModal(m.data);
+  return '';
+}
+
+function renderLeadFormModal(lead){
+  const isEdit = !!lead;
+  const d = lead || {name:'',phone:'',email:'',source:'Website',budget:'',requirement:'',stage:'New',segment:'Warm',notes:''};
+  return `
+  <div class="modal-bg" data-close="modal"><div class="modal" data-stop="1">
+    <div class="mh"><h3>${isEdit?'Edit Lead':'Add New Lead'}</h3><button data-close="modal">${ic('x',14)}</button></div>
+    <div class="mb">
+      <label class="f"><span>Full Name</span><input id="f_name" value="${esc(d.name)}" placeholder="e.g. Priya Sharma"/></label>
+      <div class="grid2">
+        <label class="f"><span>Phone</span><input id="f_phone" value="${esc(d.phone)}" placeholder="+91 98765 43210"/></label>
+        <label class="f"><span>Email</span><input id="f_email" value="${esc(d.email||'')}" placeholder="optional"/></label>
+      </div>
+      <label class="f"><span>Client Segment</span>
+        <div class="segpick" id="segPick">
+          ${LEAD_SEGMENTS.map(s=>`<button type="button" class="${d.segment===s?'sel':''}" data-seg="${s}">${s}</button>`).join('')}
+        </div>
+      </label>
+      <label class="f"><span>Requirement</span><input id="f_req" value="${esc(d.requirement||'')}" placeholder="e.g. 3BHK apartment, Andheri West"/></label>
+      <label class="f"><span>Stage</span><select id="f_stage">${LEAD_STAGES.map(s=>`<option value="${s}" ${d.stage===s?'selected':''}>${stageLabel(s)}</option>`).join('')}</select></label>
+      <label class="f"><span>Notes</span><textarea id="f_notes" rows="3">${esc(d.notes||'')}</textarea></label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-outline" data-close="modal">Cancel</button>
+        <button class="btn btn-primary" data-action="save-lead" data-id="${isEdit?d.id:''}">${isEdit?'Save Changes':'Add Lead'}</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function renderMeetingFormModal(){
+  return `
+  <div class="modal-bg" data-close="modal"><div class="modal" data-stop="1">
+    <div class="mh"><h3>Schedule Meeting or Visit</h3><button data-close="modal">${ic('x',14)}</button></div>
+    <div class="mb">
+      <label class="f"><span>Link to Lead (optional)</span>
+        <select id="m_lead"><option value="">— No lead linked —</option>${state.leads.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join('')}</select>
+      </label>
+      <label class="f"><span>Client Name</span><input id="m_client" placeholder="e.g. Rohan Mehta"/></label>
+      <label class="f"><span>Type</span><select id="m_type">${MEETING_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('')}</select></label>
+      <label class="f"><span>Date & Time</span><input type="datetime-local" id="m_dt"/></label>
+      <label class="f"><span>Location</span><input id="m_loc" placeholder="e.g. Property site, Bandra"/></label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-outline" data-close="modal">Cancel</button>
+        <button class="btn btn-primary" data-action="save-meeting">Schedule</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function renderRescheduleLeadModal(lead){
+  const existing = getNextMeetingForLead(lead.id);
+  return `
+  <div class="modal-bg" data-close="modal"><div class="modal" data-stop="1">
+    <div class="mh"><h3>Schedule / Reschedule — ${esc(lead.name)}</h3><button data-close="modal">${ic('x',14)}</button></div>
+    <div class="mb">
+      ${existing? `<p class="muted">Current: ${fmtDateTime(existing.dateTime)}</p>`:''}
+      <label class="f"><span>New Date & Time</span><input type="datetime-local" id="rl_dt"/></label>
+      <label class="f"><span>Remarks (optional)</span><input id="rl_remarks" placeholder="e.g. Client requested later slot"/></label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-outline" data-close="modal">Cancel</button>
+        <button class="btn btn-primary" data-action="save-reschedule-lead" data-id="${lead.id}" data-existing="${existing?existing.id:''}">${existing?'Confirm Reschedule':'Schedule Visit'}</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function renderRescheduleMeetingModal(m){
+  return `
+  <div class="modal-bg" data-close="modal"><div class="modal" data-stop="1">
+    <div class="mh"><h3>Reschedule — ${esc(m.clientName)}</h3><button data-close="modal">${ic('x',14)}</button></div>
+    <div class="mb">
+      <p class="muted">Current: ${fmtDateTime(m.dateTime)}</p>
+      <label class="f"><span>New Date & Time</span><input type="datetime-local" id="rm_dt"/></label>
+      <label class="f"><span>Remarks (optional)</span><input id="rm_remarks" placeholder="e.g. Client requested later slot"/></label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-outline" data-close="modal">Cancel</button>
+        <button class="btn btn-primary" data-action="save-reschedule-meeting" data-id="${m.id}">Confirm Reschedule</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function renderHistoryModal(m){
+  const hist = (m.history||[]).slice().reverse();
+  return `
+  <div class="modal-bg" data-close="modal"><div class="modal" data-stop="1">
+    <div class="mh"><h3>Reschedule History — ${esc(m.clientName)}</h3><button data-close="modal">${ic('x',14)}</button></div>
+    <div class="mb">
+      ${hist.map(h=>`
+        <div class="card" style="margin-bottom:8px;">
+          <div class="sub">${fmtDateTime(h.from)} → <b style="color:var(--ink)">${fmtDateTime(h.to)}</b></div>
+          ${h.reason? `<div style="font-size:13px;margin-top:4px;">Remarks: ${esc(h.reason)}</div>`:''}
+          <div class="sub" style="margin-top:4px;">Changed ${fmtDateTime(h.changedAt)}</div>
+        </div>`).join('')}
+    </div>
+  </div></div>`;
+}
+
+function renderDateFilterModal(){
+  const f = state.leadsFilter;
+  return `
+  <div class="modal-bg" data-close="modal"><div class="modal" data-stop="1">
+    <div class="mh"><h3>Filter by Date Added</h3><button data-close="modal">${ic('x',14)}</button></div>
+    <div class="mb">
+      <label class="f"><span>From</span><input type="date" id="df_from" value="${f.dateFrom}"/></label>
+      <label class="f"><span>To</span><input type="date" id="df_to" value="${f.dateTo}"/></label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-outline" data-action="clear-date">Clear</button>
+        <button class="btn btn-primary" data-action="apply-date">Apply</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function renderConfirmModal(data){
+  return `
+  <div class="modal-bg" data-close="modal"><div class="modal" data-stop="1" style="max-width:400px;">
+    <div class="mh"><h3>${esc(data.title)}</h3><button data-close="modal">${ic('x',14)}</button></div>
+    <div class="mb">
+      <p style="font-size:14px;color:var(--ink-light);">${esc(data.message)}</p>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-outline" data-close="modal">Cancel</button>
+        <button class="btn btn-danger" data-action="confirm-yes">${esc(data.confirmLabel||'Delete')}</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+function renderRestoreOptionsModal(data){
+  let note = '';
+  if(data.droppedLeads>0 || data.droppedMeetings>0){
+    note = '<p class="muted" style="color:var(--red);">'+data.droppedLeads+' leads and '+data.droppedMeetings+' meetings were skipped because they were missing required fields like name, phone, or date.</p>';
+  }
+  return `
+  <div class="modal-bg" data-close="modal"><div class="modal" data-stop="1">
+    <div class="mh"><h3>Add Data From File</h3><button data-close="modal">${ic('x',14)}</button></div>
+    <div class="mb">
+      <p style="font-size:14px;color:var(--ink-light);">This file has ${data.cleanLeads.length} leads and ${data.cleanMeetings.length} meetings.</p>
+      ${note}
+      <div class="card" style="margin:14px 0;background:var(--royal-light);border:none;">
+        <p style="font-size:13.5px;font-weight:700;color:var(--royal-d);margin:0 0 4px;">${ic('check',14)} Recommended: Add to existing data</p>
+        <p class="muted" style="margin:0;">New leads and meetings will be added. Any lead with a phone number you already have will be skipped, so nothing gets duplicated.</p>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-light);margin-bottom:16px;">
+        <input type="checkbox" id="replaceAllCheck" style="width:auto;"/>
+        Instead, erase everything and replace with only this file's data
+      </label>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="btn btn-outline" data-close="modal">Cancel</button>
+        <button class="btn btn-primary" data-action="do-restore">Continue</button>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+/* ---------------- CSV helpers ---------------- */
+const LEAD_COLS = ['name','phone','email','source','budget','requirement','stage','segment','notes','createdAt'];
+function leadsToCSV(leads){
+  const rows = [LEAD_COLS.join(',')];
+  leads.forEach(l=>{
+    rows.push(LEAD_COLS.map(c=>{
+      let v = l[c]===undefined||l[c]===null ? '' : String(l[c]);
+      if(v.includes(',')||v.includes('"')||v.includes('\n')) v = '"'+v.replace(/"/g,'""')+'"';
+      return v;
+    }).join(','));
+  });
+  return rows.join('\n');
+}
+function parseCSV(text){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim().length);
+  if(!lines.length) return [];
+  const headers = splitCSVLine(lines[0]);
+  return lines.slice(1).map(line=>{
+    const vals = splitCSVLine(line);
+    const obj = {};
+    headers.forEach((h,i)=> obj[h.trim()] = (vals[i]||'').trim());
+    return obj;
+  });
+}
+function splitCSVLine(line){
+  const result = []; let cur=''; let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c = line[i];
+    if(c==='"'){ if(inQ && line[i+1]==='"'){ cur+='"'; i++; } else inQ=!inQ; }
+    else if(c===',' && !inQ){ result.push(cur); cur=''; }
+    else cur+=c;
+  }
+  result.push(cur);
+  return result;
+}
+function downloadFile(content, filename, type){
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------------- Event binding ---------------- */
+function bindEvents(){
+  const app = document.getElementById('app');
+
+  app.querySelectorAll('[data-nav]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      state.view = el.getAttribute('data-nav');
+      const lf = el.getAttribute('data-lf');
+      const mf = el.getAttribute('data-mf');
+      if(lf) state.leadsFilter = Object.assign({query:'',stage:'All',segment:'All',dateFrom:'',dateTo:''}, JSON.parse(lf));
+      if(mf) state.meetingsFilter = Object.assign({status:'Upcoming',query:'',date:''}, JSON.parse(mf));
+      render();
+    });
+  });
+
+  app.querySelectorAll('[data-close="modal"]').forEach(el=>{
+    el.addEventListener('click', (e)=>{ if(e.target===el){ state.modal=null; render(); } });
+  });
+  app.querySelectorAll('[data-stop]').forEach(el=> el.addEventListener('click', e=>e.stopPropagation()));
+
+  const toastUndo = app.querySelector('[data-action="undo"]');
+  if(toastUndo) toastUndo.addEventListener('click', ()=>{ if(state.undo) state.undo(); state.toast=null; state.undo=null; render(); });
+
+  const leadSearch = document.getElementById('leadSearch');
+  if(leadSearch) leadSearch.addEventListener('input', e=>{ state.leadsFilter.query = e.target.value; render(); });
+  const stageFilter = document.getElementById('stageFilter');
+  if(stageFilter) stageFilter.addEventListener('change', e=>{ state.leadsFilter.stage = e.target.value; render(); });
+
+  app.querySelectorAll('[data-action="seg-filter"]').forEach(el=> el.addEventListener('click', ()=>{ state.leadsFilter.segment = el.getAttribute('data-seg'); render(); }));
+  const addLeadBtn = app.querySelector('[data-action="add-lead"]');
+  if(addLeadBtn) addLeadBtn.addEventListener('click', ()=>{ state.modal={type:'lead-form', data:null}; render(); });
+  app.querySelectorAll('[data-action="edit-lead"]').forEach(el=> el.addEventListener('click', ()=>{
+    const lead = state.leads.find(l=>l.id===el.getAttribute('data-id'));
+    state.modal={type:'lead-form', data:lead}; render();
+  }));
+  app.querySelectorAll('[data-action="delete-lead"]').forEach(el=> el.addEventListener('click', ()=>{
+    const id = el.getAttribute('data-id');
+    state.modal={type:'confirm', data:{title:'Delete this lead?', message:'This can be undone within a few seconds via the undo toast.', onConfirm:()=>deleteLead(id)}};
+    render();
+  }));
+  app.querySelectorAll('[data-action="reschedule-lead"]').forEach(el=> el.addEventListener('click', ()=>{
+    const lead = state.leads.find(l=>l.id===el.getAttribute('data-id'));
+    state.modal={type:'reschedule-lead', data:lead}; render();
+  }));
+  app.querySelectorAll('[data-action="mark-done"]').forEach(el=> el.addEventListener('click', ()=>{
+    const lead = state.leads.find(l=>l.id===el.getAttribute('data-id'));
+    markVisitDone(lead); render();
+  }));
+  app.querySelectorAll('[data-action="close-lead"]').forEach(el=> el.addEventListener('click', ()=>{
+    closeLead(el.getAttribute('data-id')); render();
+  }));
+  app.querySelectorAll('[data-action="mark-dead"]').forEach(el=> el.addEventListener('click', ()=>{
+    markDead(el.getAttribute('data-id')); render();
+  }));
+  const dateFilterBtn = app.querySelector('[data-action="date-filter"]');
+  if(dateFilterBtn) dateFilterBtn.addEventListener('click', ()=>{ state.modal={type:'date-filter'}; render(); });
+  app.querySelectorAll('[data-action="clear-date"]').forEach(el=> el.addEventListener('click', ()=>{
+    state.leadsFilter.dateFrom=''; state.leadsFilter.dateTo=''; state.modal=null; render();
+  }));
+  const applyDateBtn = app.querySelector('[data-action="apply-date"]');
+  if(applyDateBtn) applyDateBtn.addEventListener('click', ()=>{
+    state.leadsFilter.dateFrom = document.getElementById('df_from').value;
+    state.leadsFilter.dateTo = document.getElementById('df_to').value;
+    state.modal=null; render();
+  });
+
+  const saveLeadBtn = app.querySelector('[data-action="save-lead"]');
+  if(saveLeadBtn){
+    let selectedSeg = (state.modal.data && state.modal.data.segment) || 'Warm';
+    const segPick = document.getElementById('segPick');
+    if(segPick) segPick.querySelectorAll('button').forEach(b=> b.addEventListener('click', ()=>{
+      segPick.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));
+      b.classList.add('sel'); selectedSeg = b.getAttribute('data-seg');
+    }));
+    saveLeadBtn.addEventListener('click', ()=>{
+      const name = document.getElementById('f_name').value.trim();
+      const phone = document.getElementById('f_phone').value.trim();
+      if(!name || !phone){ alert('Name and phone are required.'); return; }
+      const data = {
+        name, phone,
+        email: document.getElementById('f_email').value.trim(),
+        requirement: document.getElementById('f_req').value.trim(),
+        stage: document.getElementById('f_stage').value,
+        segment: selectedSeg,
+        notes: document.getElementById('f_notes').value.trim(),
+        source: (state.modal.data && state.modal.data.source) || 'Website'
+      };
+      const id = saveLeadBtn.getAttribute('data-id');
+      if(id){ updateLead(id, data); showToast('Lead updated'); }
+      else { addLead(data); showToast('Lead added'); }
+      state.modal=null; render();
+    });
+  }
+
+  const saveReschedLead = app.querySelector('[data-action="save-reschedule-lead"]');
+  if(saveReschedLead) saveReschedLead.addEventListener('click', ()=>{
+    const dt = document.getElementById('rl_dt').value;
+    if(!dt){ alert('Please pick a date & time.'); return; }
+    const remarks = document.getElementById('rl_remarks').value;
+    const leadId = saveReschedLead.getAttribute('data-id');
+    const existingId = saveReschedLead.getAttribute('data-existing');
+    const lead = state.leads.find(l=>l.id===leadId);
+    if(existingId){ rescheduleMeeting(existingId, dt, remarks); }
+    else { addMeeting({clientName:lead.name, leadId:lead.id, type:'Site Visit', dateTime:dt, location:''}); }
+    state.modal=null; showToast('Visit scheduled'); render();
+  });
+
+  const importBtn = app.querySelector('[data-action="import-csv"]');
+  const csvInput = document.getElementById('csvFileInput');
+  if(importBtn) importBtn.addEventListener('click', ()=> csvInput.click());
+  if(csvInput) csvInput.addEventListener('change', (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const rows = parseCSV(reader.result);
+        const imported = rows.filter(r=>r.name).map(r=>({
+          id:uid(), name:r.name||'', phone:r.phone||'', email:r.email||'', source:r.source||'Other',
+          budget:r.budget||'', requirement:r.requirement||'', stage:r.stage||'New', segment:r.segment||'Warm',
+          notes:r.notes||'', createdAt:r.createdAt||new Date().toISOString()
+        }));
+        state.leads = imported.concat(state.leads); persistLeads();
+        showToast(imported.length+' leads imported'); render();
+      }catch(err){ showToast('Import failed: invalid CSV file'); render(); }
+    };
+    reader.readAsText(file); e.target.value='';
+  });
+  app.querySelectorAll('[data-action="export-csv"]').forEach(el=> el.addEventListener('click', ()=>{
+    const list = state.view==='leads' ? filteredLeads() : state.leads;
+    if(!list.length){ showToast('No leads to export'); render(); return; }
+    downloadFile(leadsToCSV(list), 'estatefolio-leads-'+Date.now()+'.csv', 'text/csv');
+  }));
+
+  const meetSearch = document.getElementById('meetSearch');
+  if(meetSearch) meetSearch.addEventListener('input', e=>{ state.meetingsFilter.query = e.target.value; render(); });
+  const meetDate = document.getElementById('meetDate');
+  if(meetDate) meetDate.addEventListener('change', e=>{ state.meetingsFilter.date = e.target.value; render(); });
+  app.querySelectorAll('[data-action="clear-meet-date"]').forEach(el=> el.addEventListener('click', ()=>{ state.meetingsFilter.date=''; render(); }));
+  app.querySelectorAll('[data-action="meet-status-filter"]').forEach(el=> el.addEventListener('click', ()=>{ state.meetingsFilter.status = el.getAttribute('data-s'); render(); }));
+  const addMeetingBtn = app.querySelector('[data-action="add-meeting"]');
+  if(addMeetingBtn) addMeetingBtn.addEventListener('click', ()=>{ state.modal={type:'meeting-form'}; render(); });
+  const saveMeetingBtn = app.querySelector('[data-action="save-meeting"]');
+  if(saveMeetingBtn) saveMeetingBtn.addEventListener('click', ()=>{
+    const clientName = document.getElementById('m_client').value.trim();
+    const dt = document.getElementById('m_dt').value;
+    if(!clientName || !dt){ alert('Client name and date/time are required.'); return; }
+    const leadId = document.getElementById('m_lead').value;
+    addMeeting({clientName, leadId, type:document.getElementById('m_type').value, dateTime:dt, location:document.getElementById('m_loc').value.trim()});
+    state.modal=null; showToast('Meeting scheduled'); render();
+  });
+  app.querySelectorAll('[data-action="reschedule-meeting"]').forEach(el=> el.addEventListener('click', ()=>{
+    const m = state.meetings.find(x=>x.id===el.getAttribute('data-id'));
+    state.modal={type:'reschedule-meeting', data:m}; render();
+  }));
+  const saveReschedMeeting = app.querySelector('[data-action="save-reschedule-meeting"]');
+  if(saveReschedMeeting) saveReschedMeeting.addEventListener('click', ()=>{
+    const dt = document.getElementById('rm_dt').value;
+    if(!dt){ alert('Please pick a date & time.'); return; }
+    const remarks = document.getElementById('rm_remarks').value;
+    rescheduleMeeting(saveReschedMeeting.getAttribute('data-id'), dt, remarks);
+    state.modal=null; showToast('Meeting rescheduled'); render();
+  });
+  app.querySelectorAll('[data-action="complete-meeting"]').forEach(el=> el.addEventListener('click', ()=>{
+    updateMeeting(el.getAttribute('data-id'), {status:'Completed'}); showToast('Marked as completed'); render();
+  }));
+  app.querySelectorAll('[data-action="cancel-meeting"]').forEach(el=> el.addEventListener('click', ()=>{
+    updateMeeting(el.getAttribute('data-id'), {status:'Cancelled'}); showToast('Meeting cancelled'); render();
+  }));
+  app.querySelectorAll('[data-action="delete-meeting"]').forEach(el=> el.addEventListener('click', ()=>{
+    const id = el.getAttribute('data-id');
+    state.modal={type:'confirm', data:{title:'Delete this meeting?', message:'This can be undone within a few seconds via the undo toast.', onConfirm:()=>deleteMeeting(id)}};
+    render();
+  }));
+  app.querySelectorAll('[data-action="show-history"]').forEach(el=> el.addEventListener('click', ()=>{
+    const m = state.meetings.find(x=>x.id===el.getAttribute('data-id'));
+    state.modal={type:'history', data:m}; render();
+  }));
+
+  const confirmYes = app.querySelector('[data-action="confirm-yes"]');
+  if(confirmYes) confirmYes.addEventListener('click', ()=>{
+    const fn = state.modal.data.onConfirm;
+    state.modal=null;
+    if(fn) fn();
+    render();
+  });
+
+  const doRestoreBtn = app.querySelector('[data-action="do-restore"]');
+  if(doRestoreBtn) doRestoreBtn.addEventListener('click', ()=>{
+    const { cleanLeads, cleanMeetings } = state.modal.data;
+    const replaceAll = document.getElementById('replaceAllCheck').checked;
+    if(replaceAll){
+      state.leads = cleanLeads;
+      state.meetings = cleanMeetings;
+      persistLeads(); persistMeetings();
+      showToast('Data replaced with file contents');
+    } else {
+      const existingPhones = new Set(state.leads.map(l=>digits(l.phone)).filter(Boolean));
+      const newLeads = cleanLeads.filter(l=>{
+        const d = digits(l.phone);
+        if(!d) return true; // keep leads with no phone rather than silently drop them
+        if(existingPhones.has(d)) return false;
+        existingPhones.add(d);
+        return true;
+      });
+      const skippedCount = cleanLeads.length - newLeads.length;
+      state.leads = newLeads.concat(state.leads);
+      state.meetings = cleanMeetings.concat(state.meetings);
+      persistLeads(); persistMeetings();
+      showToast(newLeads.length+' new leads and '+cleanMeetings.length+' meetings added'+(skippedCount>0?' ('+skippedCount+' duplicates skipped)':''));
+    }
+    state.modal=null;
+    render();
+  });
+
+  const fullBackupBtn = app.querySelector('[data-action="full-backup"]');
+  if(fullBackupBtn) fullBackupBtn.addEventListener('click', ()=>{
+    const json = JSON.stringify({version:1, exportedAt:new Date().toISOString(), leads:state.leads, meetings:state.meetings}, null, 2);
+    downloadFile(json, 'estatefolio-backup-'+Date.now()+'.json', 'application/json');
+    showToast('Backup downloaded'); render();
+  });
+  const restoreBtn = app.querySelector('[data-action="restore-backup"]');
+  const restoreInput = document.getElementById('restoreFileInput');
+  if(restoreBtn) restoreBtn.addEventListener('click', ()=> restoreInput.click());
+  if(restoreInput) restoreInput.addEventListener('change', e=>{
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const data = JSON.parse(reader.result);
+        if(!Array.isArray(data.leads)||!Array.isArray(data.meetings)) throw new Error('bad');
+        const cleanLeads = sanitizeLeadsArray(data.leads);
+        const cleanMeetings = sanitizeMeetingsArray(data.meetings);
+        const droppedLeads = data.leads.length - cleanLeads.length;
+        const droppedMeetings = data.meetings.length - cleanMeetings.length;
+        state.modal = {type:'restore-options', data:{cleanLeads, cleanMeetings, droppedLeads, droppedMeetings}};
+        render();
+      }catch(err){ showToast('Restore failed: invalid backup file'); render(); }
+    };
+    reader.readAsText(file); e.target.value='';
+  });
+
+  const resetAllBtn = app.querySelector('[data-action="reset-all"]');
+  if(resetAllBtn) resetAllBtn.addEventListener('click', ()=>{
+    if(confirm('This will permanently erase all leads, meetings, and settings stored in this browser. This cannot be undone. Continue?')){
+      localStorage.clear(); location.reload();
+    }
+  });
+
+  const uploadPhotoBtn = app.querySelector('[data-action="upload-photo"]');
+  const photoInput = document.getElementById('photoInput');
+  if(uploadPhotoBtn) uploadPhotoBtn.addEventListener('click', ()=> photoInput.click());
+  if(photoInput) photoInput.addEventListener('change', e=>{
+    const file = e.target.files[0]; if(!file) return;
+    if(file.size > 2*1024*1024){ showToast('Please choose an image under 2MB'); render(); return; }
+    const reader = new FileReader();
+    reader.onload = ()=>{ state.profile.photo = reader.result; persistProfile(); showToast('Profile photo updated'); render(); };
+    reader.readAsDataURL(file);
+  });
+  const removePhotoBtn = app.querySelector('[data-action="remove-photo"]');
+  if(removePhotoBtn) removePhotoBtn.addEventListener('click', ()=>{ state.profile.photo=''; persistProfile(); showToast('Profile photo removed'); render(); });
+  const saveNameBtn = app.querySelector('[data-action="save-name"]');
+  if(saveNameBtn) saveNameBtn.addEventListener('click', ()=>{
+    const val = document.getElementById('nameInput').value.trim();
+    state.profile.name = val || 'Veer'; persistProfile(); showToast('Profile updated'); render();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
